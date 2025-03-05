@@ -1,4 +1,4 @@
-# ReactJS Chrome Extension
+# LangEx Chrome Extension
 
 Installation:
 
@@ -20,4 +20,4 @@ Watch the dev version of the biuld
 
     - yarn watch
 
-Happy Coding!
+Happy Hacking!
