@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MessageType } from "../types";
-import { getArticleText, processPageTranslation, replaceTranslatedContent } from "../utils";
-// import { fillParagraphs } from "../utils";
+import { getArticleText, replaceTranslatedContent } from "../utils";
+import { config } from '../../config';
 
 interface OffsetState {
     top: number | null;
@@ -34,7 +34,7 @@ export const useSetupContent = () => {
 
         const fetchTranslation = async () => {
             try {
-                const translatedResponse = await fetch("http://localhost:8081/translate", { 
+                const translatedResponse = await fetch(`${config.API_URL}/translate`, { 
                     method: "POST",
                     body: JSON.stringify({ text: articleText }),
                     headers: {
