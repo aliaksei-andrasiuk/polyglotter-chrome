@@ -13,8 +13,6 @@ const ContentScript: FC = () => {
     const { offset } = useSetupContent();
     const showPopup = offset.top && offset.left;
 
-    console.log('ContentScript', offset);
-    
     return (
         <ReactShadowRoot mode="open">
             <h1>Hello World</h1>
@@ -24,6 +22,5 @@ const ContentScript: FC = () => {
 };
 
 export default ContentScript;
-
 
 
