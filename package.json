@@ -1,5 +1,5 @@
 {
-  "name": "reactjs-chrome",
+  "name": "polyglotter-chrome",
   "author": "Aliaksei Andrasiuk",
   "version": "1.0.0",
   "main": "index.js",
@@ -7,7 +7,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@github.com:aliaksei-andrasiuk/react-extension-poc.git"
+    "url": "git@github.com:aliaksei-andrasiuk/polyglotter-chrome.git"
   },
   "scripts": {
     "watch": "webpack --watch --progress --config webpack.dev.js",
