@@ -2,6 +2,8 @@ import { isProbablyReaderable, Readability } from "@mozilla/readability";
 
 export const getArticleText = () => {
     const readable = isProbablyReaderable(document);
+    console.log("Is probably readable:", readable);
+    
 
     if (readable) {
         const article = new Readability(document.cloneNode(true) as Document).parse();

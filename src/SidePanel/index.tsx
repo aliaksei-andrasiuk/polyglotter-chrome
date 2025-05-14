@@ -2,7 +2,7 @@ import React from "react";
 import { HashRouter as Router } from "react-router-dom";
 
 import { createRoot } from "react-dom/client";
-import '../assets/tailwind.css';
+import '../assets/index.scss';
 import App from "./SidePanel";
 
 function init() {

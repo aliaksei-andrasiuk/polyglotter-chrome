@@ -1,3 +1,5 @@
+import { MessageType } from "../types";
+
 interface ITranslatedItems {
     originalLine: string;
     translatedLine: string;
@@ -64,9 +66,41 @@ function findAndReplaceText(translations: ITranslatedItems[]) {
 
         let span = document.createElement("span");
         span.textContent = translatedLine;
-        span.style.backgroundColor = "yellow"; // Optional: Style replaced text
+        span.style.backgroundColor = "yellow";
+        span.style.cursor = "pointer";
+
+        addPopupListener(span, originalLine);
 
         range.deleteContents();
         range.insertNode(span);
     });
+}
+
+
+export const addPopupListener = (element: HTMLSpanElement, originalLine: string) => {
+    const uniqueId = Math.random().toString(24).substr(2, 9);
+
+    const action = (event: any) => {
+        window.postMessage({
+            type: MessageType.SHOW_TRANSLATION_POPUP,
+            payload: {
+                left: event.target.offsetLeft,
+                top: event.target.offsetTop,
+                width: event.target.offsetWidth,
+                height: event.target.offsetHeight,
+                originalLine,
+            }
+        }, '*');
+    }
+
+    element.addEventListener('mouseenter', action);
+    element.addEventListener('click', action);
+
+    element.addEventListener('mouseleave', () => {
+        window.postMessage({
+            type: MessageType.HIDE_TRANSLATION_POPUP,
+        }, '*');
+    });
+
+    element.id = uniqueId;
 }

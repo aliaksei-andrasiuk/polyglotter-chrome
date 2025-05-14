@@ -10,13 +10,20 @@ chrome.runtime.sendMessage('I am loading content script', (response) => {
 });
 
 const ContentScript: FC = () => {
-    const { offset } = useSetupContent();
+    const { offset, originalLine, onPopupClose, onPopupKeep } = useSetupContent();
     const showPopup = offset.top && offset.left;
 
     return (
         <ReactShadowRoot mode="open">
-            <h1>Hello World</h1>
-            {showPopup && <TranslationPopup offsetLeft={offset.left} offsetTop={offset.top} />}
+            {showPopup && (
+                <TranslationPopup
+                    offsetLeft={offset.left}
+                    offsetTop={offset.top}
+                    originalLine={originalLine}
+                    onClose={onPopupClose}
+                    onKeep={onPopupKeep}
+                />
+            )}
         </ReactShadowRoot>
     )
 };

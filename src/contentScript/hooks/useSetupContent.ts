@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageType } from "../types";
 import { getArticleText, replaceTranslatedContent } from "../utils";
 import { config } from '../../config';
@@ -12,22 +12,38 @@ const offsetDefaultState = { top: null, left: null };
 
 export const useSetupContent = () => {
     const [offset, setOffset] = useState<OffsetState>(offsetDefaultState);
+    const [originalLine, setOriginalLine] = useState<string>("");
+    let popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const onReceiveOffset = (event: MessageEvent) => {
         if (event.source === window){
-            if (event.data.type === MessageType.TRANSLATED_ELEMENT_MOUSE_ENTER) {
+            if (event.data.type === MessageType.SHOW_TRANSLATION_POPUP) {
                 console.log("Received:", event.data.payload);
     
+                onPopupKeep();
+
                 setOffset(event.data.payload);
+                setOriginalLine(event.data.payload.originalLine);
             }
 
-            if (event.data.type === MessageType.TRANSLATED_ELEMENT_MOUSE_LEAVE) {
+            if (event.data.type === MessageType.HIDE_TRANSLATION_POPUP) {
                 console.log("Received:", event.data.payload);
     
-                setOffset(offsetDefaultState);
+                onPopupClose();
             }
         }
     };
+
+    const onPopupClose = () => {
+        popupOnCloseTimeout.current = setTimeout(() => {
+            setOffset(offsetDefaultState);
+            setOriginalLine("");
+        }, 500);
+    }
+
+    const onPopupKeep = () => {
+        popupOnCloseTimeout && clearTimeout(popupOnCloseTimeout.current);
+    }
 
     useEffect(() => {
         const articleText = getArticleText();
@@ -51,7 +67,6 @@ export const useSetupContent = () => {
         }
 
         fetchTranslation();
-        // fillParagraphs();
         // processPageTranslation();
 
         window.addEventListener("message", onReceiveOffset, false);
@@ -62,6 +77,6 @@ export const useSetupContent = () => {
         }
     }, []);
 
-    return { offset }
+    return { offset, originalLine, onPopupClose, onPopupKeep }
 }
 
