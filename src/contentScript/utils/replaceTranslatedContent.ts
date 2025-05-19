@@ -1,3 +1,4 @@
+import { MouseEvent } from "react";
 import { MessageType } from "../types";
 
 interface ITranslatedItems {
@@ -10,82 +11,106 @@ export const replaceTranslatedContent = (translatedItems: ITranslatedItems[]) =>
 }
 
 function findAndReplaceText(translations: ITranslatedItems[]) {
-    let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
-    let textNodes: Node[] = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    const textNodes: Text[] = [];
 
-    // 1️⃣ Collect all text nodes
     while (walker.nextNode()) {
-        if (walker.currentNode.nodeValue?.trim().length > 0) {
-            textNodes.push(walker.currentNode);
+        const node = walker.currentNode as Text;
+        if (node.nodeValue?.trim().length > 0) {
+            textNodes.push(node);
         }
     }
 
-    // 2️⃣ Combine text nodes into a single string with positional mapping
     let fullText = "";
-    let indexMapping: { index: number; node: Node }[] = [];
+    const indexMapping: { index: number; node: Text }[] = [];
 
-    textNodes.forEach((node, index) => {
+    textNodes.forEach(node => {
         indexMapping.push({ index: fullText.length, node });
-        fullText += node.nodeValue + " "; // Space preserves readability
+        fullText += node.nodeValue + " ";
     });
 
-    // 3️⃣ Iterate over all translation items
-    translations.forEach(({ originalLine, translatedLine }) => {
-        let searchIndex = fullText.indexOf(originalLine);
-        if (searchIndex === -1) return; // Skip if not found
+    fullText = fullText.toLowerCase();
 
-        // 4️⃣ Determine the affected text nodes and positions
-        let startNode: Node | null = null, endNode: Node | null = null;
-        let startOffset = 0, endOffset = 0;
-        let selectedNodes: Node[] = [];
+    const translationMap = new Map<string, string>();
+    for (const { originalLine, translatedLine } of translations) {
+        const normalized = originalLine.toLowerCase();
+        if (!translationMap.has(normalized)) {
+            translationMap.set(normalized, translatedLine);
+        }
+    }
+
+    const escapedWords = [...translationMap.keys()].map(w =>
+        w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    );
+    const pattern = new RegExp(`\\b(${escapedWords.join('|')})\\b`, 'gi');
+
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(fullText)) !== null) {
+        const original = match[1].toLowerCase();
+        const translated = translationMap.get(original);
+        if (!translated) continue;
+
+        const startIndex = match.index;
+        const endIndex = startIndex + match[0].length;
+
+        let startNode: Text | null = null,
+            endNode: Text | null = null;
+        let startOffset = 0,
+            endOffset = 0;
 
         for (let i = 0; i < indexMapping.length; i++) {
-            let { index, node } = indexMapping[i];
-            let nextIndex = indexMapping[i + 1] ? indexMapping[i + 1].index : fullText.length;
+            const { index, node } = indexMapping[i];
+            const nextIndex = indexMapping[i + 1]?.index ?? fullText.length;
 
-            if (searchIndex >= index && searchIndex < nextIndex) {
+            if (startIndex >= index && startIndex < nextIndex) {
                 startNode = node;
-                startOffset = searchIndex - index;
+                startOffset = startIndex - index;
             }
 
-            if (searchIndex + originalLine.length > index && searchIndex + originalLine.length <= nextIndex) {
+            if (endIndex > index && endIndex <= nextIndex) {
                 endNode = node;
-                endOffset = searchIndex + originalLine.length - index;
+                endOffset = endIndex - index;
                 break;
             }
-
-            if (startNode) selectedNodes.push(node);
         }
 
-        if (!startNode || !endNode) return;
+        if (!startNode || !endNode) continue;
 
-        // 5️⃣ Replace text in affected nodes
-        let range = document.createRange();
-        range.setStart(startNode, startOffset);
-        range.setEnd(endNode, endOffset);
+        if (
+            startNode.parentElement?.classList.contains('pl-en-translation') ||
+            endNode.parentElement?.classList.contains('pl-en-translation')
+        ) {
+            continue;
+        }
 
-        let span = document.createElement("span");
-        span.textContent = translatedLine;
+        const range = document.createRange();
+        range.setStart(startNode, Math.min(startOffset, startNode.nodeValue!.length));
+        range.setEnd(endNode, Math.min(endOffset, endNode.nodeValue!.length));
+
+        const span = document.createElement("span");
+        span.textContent = translated;
         span.style.backgroundColor = "yellow";
         span.style.cursor = "pointer";
+        span.className = "pl-en-translation";
 
-        addPopupListener(span, originalLine);
+        addPopupListener(span, match[1]);
 
         range.deleteContents();
         range.insertNode(span);
-    });
+    }
 }
-
 
 export const addPopupListener = (element: HTMLSpanElement, originalLine: string) => {
     const uniqueId = Math.random().toString(24).substr(2, 9);
 
     const action = (event: any) => {
+        const { top, left } = event.target.getBoundingClientRect();
+
         window.postMessage({
             type: MessageType.SHOW_TRANSLATION_POPUP,
             payload: {
-                left: event.target.offsetLeft,
-                top: event.target.offsetTop,
+                left: left + window.scrollX,
+                top: top + window.scrollY,
                 width: event.target.offsetWidth,
                 height: event.target.offsetHeight,
                 originalLine,

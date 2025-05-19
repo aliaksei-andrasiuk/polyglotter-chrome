@@ -26,7 +26,7 @@ export const TranslationPopup: FC<TranslationPopupProps> = ({
             className="translation-popup-wrapper"
             style={{
                 transform: `translateX(${translateX}) translateY(${translateY}) translateZ(0px)`,
-                transition: 'transform 1s ease-in-out',
+                transition: 'transform 0.7s ease-in-out',
                 position: 'absolute',
                 zIndex: 9999999999,
                 top: 0,

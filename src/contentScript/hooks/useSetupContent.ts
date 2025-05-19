@@ -15,36 +15,6 @@ export const useSetupContent = () => {
     const [originalLine, setOriginalLine] = useState<string>("");
     let popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const onReceiveOffset = (event: MessageEvent) => {
-        if (event.source === window){
-            if (event.data.type === MessageType.SHOW_TRANSLATION_POPUP) {
-                console.log("Received:", event.data.payload);
-    
-                onPopupKeep();
-
-                setOffset(event.data.payload);
-                setOriginalLine(event.data.payload.originalLine);
-            }
-
-            if (event.data.type === MessageType.HIDE_TRANSLATION_POPUP) {
-                console.log("Received:", event.data.payload);
-    
-                onPopupClose();
-            }
-        }
-    };
-
-    const onPopupClose = () => {
-        popupOnCloseTimeout.current = setTimeout(() => {
-            setOffset(offsetDefaultState);
-            setOriginalLine("");
-        }, 500);
-    }
-
-    const onPopupKeep = () => {
-        popupOnCloseTimeout && clearTimeout(popupOnCloseTimeout.current);
-    }
-
     useEffect(() => {
         const articleText = getArticleText();
 
@@ -75,7 +45,37 @@ export const useSetupContent = () => {
         return () => {
             window.removeEventListener("message", onReceiveOffset, false);
         }
-    }, []);
+    }, []);4
+
+        const onReceiveOffset = (event: MessageEvent) => {
+        if (event.source === window){
+            if (event.data.type === MessageType.SHOW_TRANSLATION_POPUP) {
+                console.log("Received:", event.data.payload);
+    
+                onPopupKeep();
+
+                setOffset(event.data.payload);
+                setOriginalLine(event.data.payload.originalLine);
+            }
+
+            if (event.data.type === MessageType.HIDE_TRANSLATION_POPUP) {
+                console.log("Received:", event.data.payload);
+    
+                onPopupClose();
+            }
+        }
+    };
+
+    const onPopupClose = () => {
+        popupOnCloseTimeout.current = setTimeout(() => {
+            setOffset(offsetDefaultState);
+            setOriginalLine("");
+        }, 500);
+    }
+
+    const onPopupKeep = () => {
+        popupOnCloseTimeout && clearTimeout(popupOnCloseTimeout.current);
+    }
 
     return { offset, originalLine, onPopupClose, onPopupKeep }
 }
