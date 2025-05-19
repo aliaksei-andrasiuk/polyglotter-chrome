@@ -11,7 +11,7 @@
   },
   "scripts": {
     "watch": "webpack --watch --progress --config webpack.dev.js",
-    "build": "webpack --watch --progress --config webpack.prod.js"
+    "build": "webpack --progress --config webpack.prod.js"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",

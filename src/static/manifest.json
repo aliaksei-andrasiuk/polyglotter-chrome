@@ -1,20 +1,21 @@
 {
     "manifest_version": 3,
-    "name": "react-boilerplate",
-    "description": "react-boilerplate for chrome extension",
+    "name": "Polyglotter",
+    "description": "Learn a new language with Polyglotter! Get translations and definitions as you browse the web.",
     "version": "1.0.0",
     "action" : {
-        "default_title": "React Boilerplate",
-        "default_icon" : "icon.png"
+        "default_title": "Polyglotter",
+        "default_icon" : "icon-128.png"
     },
     "side_panel": {
         "default_path": "sidePanel.html"
     },
     "permissions": ["tabs", "scripting", "sidePanel", "storage"],
     "icons": {
-        "16" : "icon.png",
-        "48" : "icon.png",
-        "128" : "icon.png"
+        "16" : "icon-16.png",
+        "32" : "icon-32.png",
+        "48" : "icon-48.png",
+        "128" : "icon-128.png"
     },
     "background": {
         "service_worker": "background.js"
