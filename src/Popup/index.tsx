@@ -3,7 +3,7 @@ import { HashRouter as Router } from "react-router-dom";
 
 import { createRoot } from "react-dom/client";
 import '../assets/index.scss';
-import App from "./SidePanel";
+import App from "./Popup";
 
 function init() {
     const appContainer = document.createElement('div');

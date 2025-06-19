@@ -5,7 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     entry: {
-        sidePanel: path.resolve('src/SidePanel/index.tsx'),
+        popup: path.resolve('src/Popup/index.tsx'),
         background: path.resolve('src/background/background.ts'),
         contentScript: path.resolve('src/contentScript/index.tsx'),
     },
@@ -27,13 +27,26 @@ module.exports = {
             cleanStaleWebpackAssets: false
         }),
         new CopyPlugin({
-            patterns: [{
-                from: path.resolve('src/static'),
-                to: path.resolve('dist')
-            }]
+            patterns: [
+                {
+                    from: path.resolve('src/static/manifest.json'),
+                    to: path.resolve('dist/manifest.json')
+                },
+                {
+                    from: path.resolve(__dirname, '_locales'),
+                    to: '_locales'
+                },
+                {
+                    from: path.resolve('src/static'),
+                    to: path.resolve('dist'),
+                    globOptions: {
+                        ignore: ['**/manifest.json', '**/_locales/**']
+                    }
+                }
+            ]
         }),
         ...getHtmlPlugins([
-            'sidePanel',
+            'popup',
         ])
     ],
     resolve: {

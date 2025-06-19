@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageType } from "../types";
 import { getArticleText, replaceTranslatedContent } from "../utils";
-import { config } from '../../config';
 
 interface OffsetState {
     top: number | null;
@@ -18,9 +17,14 @@ export const useSetupContent = () => {
     useEffect(() => {
         const articleText = getArticleText();
 
+        if (!articleText) {
+            console.error("No article text found.");
+            return;
+        }
+
         const fetchTranslation = async () => {
             try {
-                const translatedResponse = await fetch(`${config.API_URL}/translate`, { 
+                const translatedResponse = await fetch(`${process.env.API_URL}/translate`, { 
                     method: "POST",
                     body: JSON.stringify({ text: articleText }),
                     headers: {
@@ -37,15 +41,13 @@ export const useSetupContent = () => {
         }
 
         fetchTranslation();
-        // processPageTranslation();
 
         window.addEventListener("message", onReceiveOffset, false);
-
 
         return () => {
             window.removeEventListener("message", onReceiveOffset, false);
         }
-    }, []);4
+    }, []);
 
         const onReceiveOffset = (event: MessageEvent) => {
         if (event.source === window){
@@ -59,18 +61,18 @@ export const useSetupContent = () => {
             }
 
             if (event.data.type === MessageType.HIDE_TRANSLATION_POPUP) {
-                console.log("Received:", event.data.payload);
-    
                 onPopupClose();
             }
         }
     };
 
     const onPopupClose = () => {
-        popupOnCloseTimeout.current = setTimeout(() => {
-            setOffset(offsetDefaultState);
-            setOriginalLine("");
-        }, 500);
+        if(popupOnCloseTimeout && popupOnCloseTimeout.current) {
+            popupOnCloseTimeout.current = setTimeout(() => {
+                setOffset(offsetDefaultState);
+                setOriginalLine("");
+            }, 500);
+        }
     }
 
     const onPopupKeep = () => {

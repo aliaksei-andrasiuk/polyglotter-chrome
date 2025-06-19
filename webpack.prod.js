@@ -3,6 +3,8 @@ const common = require('./webpack.common.js');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+const path = require('path');
 
 module.exports = merge(common, {
     mode: 'production',
@@ -11,17 +13,20 @@ module.exports = merge(common, {
             {
                 test: /\.scss$/,
                 use: [
-                MiniCssExtractPlugin.loader,
-                'css-loader',
-                'postcss-loader',
-                'sass-loader',
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'postcss-loader',
+                    'sass-loader',
                 ],
             },
         ],
     },
     plugins: [
         new MiniCssExtractPlugin({
-        filename: '[name].css',
+            filename: '[name].css',
+        }),
+        new Dotenv({
+            path: path.resolve(__dirname, 'env/.env.prod'),
         }),
     ],
     optimization: {
@@ -33,7 +38,7 @@ module.exports = merge(common, {
         splitChunks: {
             chunks(chunk) {
                 return chunk.name !== 'contentScript';
-            }
+            },
         },
-    },       
+    },
 });
