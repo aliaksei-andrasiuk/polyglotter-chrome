@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageType } from "../types";
-import { getArticleText, replaceTranslatedContent } from "../utils";
+import { getArticleText, replaceTranslatedContent } from "../../core";
 
 interface OffsetState {
     top: number | null;
@@ -67,12 +67,10 @@ export const useSetupContent = () => {
     };
 
     const onPopupClose = () => {
-        if(popupOnCloseTimeout && popupOnCloseTimeout.current) {
-            popupOnCloseTimeout.current = setTimeout(() => {
-                setOffset(offsetDefaultState);
-                setOriginalLine("");
-            }, 500);
-        }
+        popupOnCloseTimeout.current = setTimeout(() => {
+            setOffset(offsetDefaultState);
+            setOriginalLine("");
+        }, 500);
     }
 
     const onPopupKeep = () => {
