@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC } from 'react';
 
 import './TranslationPopup.scss';
 interface TranslationPopupProps {
@@ -7,8 +7,6 @@ interface TranslationPopupProps {
     offsetTop: number;
     onClose: () => void;
     onKeep: () => void;
-    // offsetWidth: number;
-    // offsetHeight: number;
 }
 
 export const TranslationPopup: FC<TranslationPopupProps> = ({
@@ -16,7 +14,7 @@ export const TranslationPopup: FC<TranslationPopupProps> = ({
     offsetLeft,
     originalLine,
     onClose,
-    onKeep,
+    onKeep
 }) => {
     const translateX = offsetLeft ? `${offsetLeft}px` : '-1000px';
     const translateY = offsetTop ? `${offsetTop}px` : '-1000px';
@@ -41,12 +39,12 @@ export const TranslationPopup: FC<TranslationPopupProps> = ({
                 borderRadius: '5px',
                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
                 color: 'white',
-                fontSize: '16px',
+                fontSize: '16px'
             }}
             onMouseLeave={onClose}
             onMouseEnter={onKeep}
         >
             <span>{originalLine}</span>
         </div>
-    )
+    );
 };

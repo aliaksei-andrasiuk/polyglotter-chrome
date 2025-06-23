@@ -1,17 +1,17 @@
-import { MessageType } from "../core";
+import { MessageType } from '../core';
 
 const PAUSE_OPTIONS: Record<string, number | 'tomorrow' | 'indefinitely'> = {
     pause_1h: 1,
     pause_3h: 3,
     pause_tomorrow: 'tomorrow',
-    pause_indefinitely: 'indefinitely',
+    pause_indefinitely: 'indefinitely'
 };
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: 'pause_parent',
         title: 'Pause',
-        contexts: ['action'],
+        contexts: ['action']
     });
 
     chrome.contextMenus.create({
@@ -25,21 +25,21 @@ chrome.runtime.onInstalled.addListener(() => {
         id: 'pause_3h',
         parentId: 'pause_parent',
         title: '3 hours',
-        contexts: ['action'],
+        contexts: ['action']
     });
 
     chrome.contextMenus.create({
         id: 'pause_tomorrow',
         parentId: 'pause_parent',
         title: 'Until tomorrow',
-        contexts: ['action'],
+        contexts: ['action']
     });
 
     chrome.contextMenus.create({
         id: 'pause_indefinitely',
         parentId: 'pause_parent',
         title: 'Indefinitely',
-        contexts: ['action'],
+        contexts: ['action']
     });
 });
 
@@ -53,7 +53,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         until = Date.now() + value * 60 * 60 * 1000;
     }
 
-    if (value === "tomorrow") {
+    if (value === 'tomorrow') {
         const tomorrow = new Date();
         tomorrow.setHours(0, 0, 0, 0);
         tomorrow.setDate(tomorrow.getDate() + 1);

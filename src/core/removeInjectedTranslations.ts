@@ -6,7 +6,7 @@ export const removeInjectedTranslations = () => {
 
         if (original !== null) {
             const textNode = document.createTextNode(original);
-            el.replaceWith(textNode); 
+            el.replaceWith(textNode);
         }
     });
-}
+};

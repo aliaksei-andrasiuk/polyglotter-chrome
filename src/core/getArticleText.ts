@@ -1,4 +1,4 @@
-import { isProbablyReaderable, Readability } from "@mozilla/readability";
+import { isProbablyReaderable, Readability } from '@mozilla/readability';
 
 export const getArticleText = () => {
     const readable = isProbablyReaderable(document);
@@ -11,5 +11,3 @@ export const getArticleText = () => {
 
     return null;
 };
-
-

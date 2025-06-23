@@ -1,2 +1,1 @@
-
 export { TranslationPopup } from './TranslationPopup';

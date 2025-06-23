@@ -1,9 +1,17 @@
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const HtmlPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+import path from 'path';
+import CopyPlugin from 'copy-webpack-plugin';
+import HtmlPlugin from 'html-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
-module.exports = {
+function getHtmlPlugins(chunks) {
+    return chunks.map(chunk => new HtmlPlugin({
+        title: 'React Extension',
+        filename: `${chunk}.html`,
+        chunks: [chunk]
+    }));
+}
+
+export default {
     entry: {
         popup: path.resolve('src/Popup/index.tsx'),
         background: path.resolve('src/background/background.ts'),
@@ -14,15 +22,15 @@ module.exports = {
             {
                 use: 'ts-loader',
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
+                exclude: /node_modules/
             },
             {
-                type: 'assets/resource',
-                test: /\.(png|jpg|jpeg|gif|woff|woff2|tff|eot|svg)$/,
-            },
+                type: 'asset/resource',
+                test: /\.(png|jpg|jpeg|gif|woff|woff2|tff|eot|svg)$/
+            }
         ]
     },
-    "plugins": [
+    plugins: [
         new CleanWebpackPlugin({
             cleanStaleWebpackAssets: false
         }),
@@ -33,7 +41,7 @@ module.exports = {
                     to: path.resolve('dist/manifest.json')
                 },
                 {
-                    from: path.resolve(__dirname, '_locales'),
+                    from: path.resolve('_locales'),
                     to: '_locales'
                 },
                 {
@@ -45,23 +53,13 @@ module.exports = {
                 }
             ]
         }),
-        ...getHtmlPlugins([
-            'popup',
-        ])
+        ...getHtmlPlugins(['popup'])
     ],
     resolve: {
         extensions: ['.tsx', '.js', '.ts']
     },
     output: {
         filename: '[name].js',
-        path: path.join(__dirname, 'dist')
-    },
-}
-
-function getHtmlPlugins(chunks) {
-    return chunks.map(chunk => new HtmlPlugin({
-        title: 'React Extension',
-        filename: `${chunk}.html`,
-        chunks: [chunk]
-    }))
-}
+        path: path.resolve('dist')
+    }
+};

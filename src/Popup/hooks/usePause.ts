@@ -1,5 +1,5 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { MessageType } from "../../core";
+import { ChangeEvent, useEffect, useState } from 'react';
+import { MessageType } from '../../core';
 
 export const usePauseExtension = () => {
     const [isPaused, setIsPaused] = useState(false);
@@ -8,10 +8,10 @@ export const usePauseExtension = () => {
         chrome.storage.local.get(['pauseState'], (result) => {
             const pauseState = result.pauseState;
 
-            if (pauseState?.isPaused) {
-                setIsPaused(true);
-            } else {
+            if (!pauseState || pauseState.isPaused !== true || (pauseState.until && pauseState.until < Date.now())) {
                 setIsPaused(false);
+            } else {
+                setIsPaused(true);
             }
         });
     }, []);
@@ -24,14 +24,14 @@ export const usePauseExtension = () => {
         if (checked) {
             const until = -1;
             await chrome.storage.local.set({
-                pauseState: { isPaused: true, until },
+                pauseState: { isPaused: true, until }
             });
 
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             tab?.id && chrome.tabs.sendMessage(tab.id, { type: MessageType.PAUSE_EXTENSION, until });
         } else {
             await chrome.storage.local.set({
-                pauseState: { isPaused: false, until: 0 },
+                pauseState: { isPaused: false, until: 0 }
             });
 
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -43,4 +43,4 @@ export const usePauseExtension = () => {
         isPaused,
         handlePauseChange
     };
-}
+};

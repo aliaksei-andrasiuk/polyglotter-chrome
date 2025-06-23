@@ -1,14 +1,13 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home from './components/Home'
-import About from './components/About'
-import Settings from './components/Settings'
-import './Popup.scss'
-import { Link } from 'react-router-dom'
-import { usePauseExtension } from './hooks'
+import React from 'react';
+import { Routes, Route, Link } from 'react-router';
+import Home from './components/Home';
+import About from './components/About';
+import Settings from './components/Settings';
+import './Popup.scss';
+import { usePauseExtension } from './hooks';
 
 function Popup() {
-    const {isPaused, handlePauseChange } = usePauseExtension();
+    const { isPaused, handlePauseChange } = usePauseExtension();
 
     return (
         <div>
@@ -30,16 +29,10 @@ function Popup() {
             </Routes>
             <div>
                 <label htmlFor="pause-checkbox">Pause</label>
-                <input
-                    type="checkbox"
-                    name=""
-                    id="pause-checkbox"
-                    checked={isPaused}
-                    onChange={handlePauseChange}
-                />
+                <input type="checkbox" name="" id="pause-checkbox" checked={isPaused} onChange={handlePauseChange} />
             </div>
         </div>
-    )
+    );
 }
 
-export default Popup
+export default Popup;

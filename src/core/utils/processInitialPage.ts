@@ -1,11 +1,7 @@
 const TRASH_REGEX = /^[\s\p{P}\p{S}\p{N}]+$/u;
 
 export const processInitialPage = () => {
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        null
-    );
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
 
     const textNodes: Text[] = [];
 

@@ -1,6 +1,6 @@
-import { TRANSLATED_ITEM_CLASSNAME } from "./core.constants";
-import { ITranslatedItems } from "./types";
-import { createTranslationElement, processInitialPage } from "./utils";
+import { TRANSLATED_ITEM_CLASSNAME } from './core.constants';
+import { ITranslatedItems } from './types';
+import { createTranslationElement, processInitialPage } from './utils';
 
 const WORD = '[\\p{L}\\p{N}_]';
 
@@ -15,12 +15,10 @@ export const replaceTranslatedContent = (translations: ITranslatedItems[]) => {
         }
     }
 
-    const escapedWords = [...translationMap.keys()].map(w =>
-        w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    );
+    const escapedWords = [...translationMap.keys()].map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     if (escapedWords.length === 0) return;
 
-    const pattern = new RegExp(`(?<!${WORD})(${escapedWords.join("|")})(?!${WORD})`, "giu");
+    const pattern = new RegExp(`(?<!${WORD})(${escapedWords.join('|')})(?!${WORD})`, 'giu');
 
     for (const node of textNodes) {
         const parent = node.parentElement;
@@ -41,7 +39,7 @@ export const replaceTranslatedContent = (translations: ITranslatedItems[]) => {
                 start: match.index,
                 end: match.index + match[0].length,
                 originalLine,
-                translatedLine,
+                translatedLine
             });
         }
 

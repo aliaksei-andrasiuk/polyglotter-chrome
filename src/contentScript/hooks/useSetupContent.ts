@@ -1,17 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import { getArticleText, replaceTranslatedContent, MessageType, removeInjectedTranslations } from "../../core";
-
-interface OffsetState {
-    top: number | null;
-    left: number | null;
-}
+import { useEffect, useRef, useState } from 'react';
+import {
+    getArticleText,
+    replaceTranslatedContent,
+    MessageType,
+    removeInjectedTranslations,
+    IMessage,
+    IOffsetPayload
+} from '../../core';
+import { OffsetState } from './useSetupContent.types';
 
 const offsetDefaultState = { top: null, left: null };
 
 export const useSetupContent = () => {
     const [offset, setOffset] = useState<OffsetState>(offsetDefaultState);
-    const [originalLine, setOriginalLine] = useState<string>("");
-    let popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [originalLine, setOriginalLine] = useState<string>('');
+    const popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         chrome.storage.local.get(['pauseState'], (result) => {
@@ -23,17 +26,16 @@ export const useSetupContent = () => {
             }
         });
 
-
-        window.addEventListener("message", onReceiveOffset, false);
+        window.addEventListener('message', onReceiveOffset, false);
         chrome.runtime.onMessage.addListener(handleChromeMessage);
 
         return () => {
-            window.removeEventListener("message", onReceiveOffset, false);
+            window.removeEventListener('message', onReceiveOffset, false);
             chrome.runtime.onMessage.removeListener(handleChromeMessage);
-        }
+        };
     }, []);
 
-    const handleChromeMessage = (message: any) => {
+    const handleChromeMessage = (message: IMessage<IOffsetPayload>) => {
         if (message.type === MessageType.PAUSE_EXTENSION) {
             removeInjectedTranslations();
         }
@@ -47,35 +49,34 @@ export const useSetupContent = () => {
         const articleText = getArticleText();
 
         if (!articleText) {
-            console.error("No article text found.");
+            console.error('No article text found.');
             return;
         }
 
         const fetchTranslation = async () => {
             try {
-                const translatedResponse = await fetch(`${process.env.API_URL}/translate`, { 
-                    method: "POST",
+                const translatedResponse = await fetch(`${process.env.API_URL}/translate`, {
+                    method: 'POST',
                     body: JSON.stringify({ text: articleText }),
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     }
-                }).then(res => res.json());
+                }).then((res) => res.json());
 
-                replaceTranslatedContent(translatedResponse.data)
-    
-                console.log("Translated text:", translatedResponse.data); 
+                replaceTranslatedContent(translatedResponse.data);
+
+                console.log('Translated text:', translatedResponse.data);
             } catch (error) {
-                console.error("Failed to fetch translation:", error);
+                console.error('Failed to fetch translation:', error);
             }
-        }
+        };
 
         fetchTranslation();
-    }
+    };
 
     const onReceiveOffset = (event: MessageEvent) => {
-        if (event.source === window){
+        if (event.source === window) {
             if (event.data.type === MessageType.SHOW_TRANSLATION_POPUP) {
-    
                 onPopupKeep();
 
                 setOffset(event.data.payload);
@@ -91,14 +92,13 @@ export const useSetupContent = () => {
     const onPopupClose = () => {
         popupOnCloseTimeout.current = setTimeout(() => {
             setOffset(offsetDefaultState);
-            setOriginalLine("");
+            setOriginalLine('');
         }, 500);
-    }
+    };
 
     const onPopupKeep = () => {
         popupOnCloseTimeout && clearTimeout(popupOnCloseTimeout.current);
-    }
+    };
 
-    return { offset, originalLine, onPopupClose, onPopupKeep }
-}
-
+    return { offset, originalLine, onPopupClose, onPopupKeep };
+};
