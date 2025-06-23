@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageType } from "../types";
-import { getArticleText, replaceTranslatedContent } from "../../core";
+import { getArticleText, replaceTranslatedContent, MessageType, removeInjectedTranslations } from "../../core";
 
 interface OffsetState {
     top: number | null;
@@ -15,6 +14,36 @@ export const useSetupContent = () => {
     let popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
+        chrome.storage.local.get(['pauseState'], (result) => {
+            const pauseState = result.pauseState;
+            const now = Date.now();
+
+            if (!pauseState || pauseState.isPaused !== true || (pauseState.until && pauseState.until < now)) {
+                handleSetupContent();
+            }
+        });
+
+
+        window.addEventListener("message", onReceiveOffset, false);
+        chrome.runtime.onMessage.addListener(handleChromeMessage);
+
+        return () => {
+            window.removeEventListener("message", onReceiveOffset, false);
+            chrome.runtime.onMessage.removeListener(handleChromeMessage);
+        }
+    }, []);
+
+    const handleChromeMessage = (message: any) => {
+        if (message.type === MessageType.PAUSE_EXTENSION) {
+            removeInjectedTranslations();
+        }
+
+        if (message.type === MessageType.RESUME_EXTENSION) {
+            handleSetupContent();
+        }
+    };
+
+    const handleSetupContent = () => {
         const articleText = getArticleText();
 
         if (!articleText) {
@@ -41,18 +70,11 @@ export const useSetupContent = () => {
         }
 
         fetchTranslation();
+    }
 
-        window.addEventListener("message", onReceiveOffset, false);
-
-        return () => {
-            window.removeEventListener("message", onReceiveOffset, false);
-        }
-    }, []);
-
-        const onReceiveOffset = (event: MessageEvent) => {
+    const onReceiveOffset = (event: MessageEvent) => {
         if (event.source === window){
             if (event.data.type === MessageType.SHOW_TRANSLATION_POPUP) {
-                console.log("Received:", event.data.payload);
     
                 onPopupKeep();
 

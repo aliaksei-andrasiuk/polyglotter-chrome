@@ -7,6 +7,7 @@ export const createTranslationElement = ({ originalLine, translatedLine }: ITran
         span.style.backgroundColor = "yellow";
         span.style.cursor = "pointer";
         span.className = TRANSLATED_ITEM_CLASSNAME;
+        span.dataset.originalLine = originalLine;
 
         addPopupListener(span, originalLine);
 

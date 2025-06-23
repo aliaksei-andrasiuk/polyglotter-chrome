@@ -5,8 +5,11 @@ import About from './components/About'
 import Settings from './components/Settings'
 import './Popup.scss'
 import { Link } from 'react-router-dom'
+import { usePauseExtension } from './hooks'
 
 function Popup() {
+    const {isPaused, handlePauseChange } = usePauseExtension();
+
     return (
         <div>
             <ul>
@@ -25,6 +28,16 @@ function Popup() {
                 <Route path="/about" element={<About />} />
                 <Route path="/settings" element={<Settings />} />
             </Routes>
+            <div>
+                <label htmlFor="pause-checkbox">Pause</label>
+                <input
+                    type="checkbox"
+                    name=""
+                    id="pause-checkbox"
+                    checked={isPaused}
+                    onChange={handlePauseChange}
+                />
+            </div>
         </div>
     )
 }
