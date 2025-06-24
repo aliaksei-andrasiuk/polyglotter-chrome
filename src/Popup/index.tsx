@@ -4,6 +4,8 @@ import { HashRouter as Router } from 'react-router';
 import { createRoot } from 'react-dom/client';
 import '../assets/index.scss';
 import App from './Popup';
+import { theme } from '../ui';
+import { ThemeProvider } from '@mui/material';
 
 function init() {
     const appContainer = document.createElement('div');
@@ -17,7 +19,9 @@ function init() {
 
     root.render(
         <Router>
-            <App />
+            <ThemeProvider theme={theme}>
+                <App />
+            </ThemeProvider>
         </Router>
     );
 }

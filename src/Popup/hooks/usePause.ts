@@ -2,45 +2,45 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { MessageType } from '../../core';
 
 export const usePauseExtension = () => {
-    const [isPaused, setIsPaused] = useState(false);
+    const [isEnabled, setIsEnabled] = useState(false);
 
     useEffect(() => {
-        chrome.storage.local.get(['pauseState'], (result) => {
-            const pauseState = result.pauseState;
+        chrome.storage.local.get(['extensionStatus'], (result) => {
+            const status = result.extensionStatus;
 
-            if (!pauseState || pauseState.isPaused !== true || (pauseState.until && pauseState.until < Date.now())) {
-                setIsPaused(false);
+            if (!status || status.isEnabled) {
+                setIsEnabled(true);
             } else {
-                setIsPaused(true);
+                setIsEnabled(false);
             }
         });
     }, []);
 
-    const handlePauseChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const handleExtensionStatusChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
 
-        setIsPaused(checked);
+        setIsEnabled(checked);
 
         if (checked) {
-            const until = -1;
             await chrome.storage.local.set({
-                pauseState: { isPaused: true, until }
-            });
-
-            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            tab?.id && chrome.tabs.sendMessage(tab.id, { type: MessageType.PAUSE_EXTENSION, until });
-        } else {
-            await chrome.storage.local.set({
-                pauseState: { isPaused: false, until: 0 }
+                extensionStatus: { isEnabled: false, until: 0 }
             });
 
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             tab?.id && chrome.tabs.sendMessage(tab.id, { type: MessageType.RESUME_EXTENSION });
+        } else {
+            const until = -1;
+            await chrome.storage.local.set({
+                extensionStatus: { isEnabled: true, until }
+            });
+
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            tab?.id && chrome.tabs.sendMessage(tab.id, { type: MessageType.PAUSE_EXTENSION, until });
         }
     };
 
     return {
-        isPaused,
-        handlePauseChange
+        isEnabled,
+        handleExtensionStatusChange
     };
 };

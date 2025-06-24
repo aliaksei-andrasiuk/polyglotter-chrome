@@ -43,6 +43,26 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+chrome.runtime.onStartup.addListener(() => {
+    chrome.storage.local.get(['extensionStatus'], (result) => {
+        const status = result.extensionStatus;
+
+        if (!status) {
+            chrome.storage.local.set({
+                extensionStatus: { isEnabled: true, until: null }
+            });
+
+            return;
+        }
+
+        if (status && !status.isEnabled && status.until && status.until < Date.now()) {
+            chrome.storage.local.set({
+                extensionStatus: { isEnabled: true, until: null }
+            });
+        }
+    });
+});
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const key = info.menuItemId;
     const value = PAUSE_OPTIONS[key];
@@ -61,7 +81,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 
     await chrome.storage.local.set({
-        pauseState: { isPaused: true, until }
+        extensionStatus: { isEnabled: false, until }
     });
 
     if (tab?.id) {

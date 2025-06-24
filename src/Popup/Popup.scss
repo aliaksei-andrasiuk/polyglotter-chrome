@@ -1,14 +1,12 @@
 body {
     display: block;
-    width: 500px;
-    height: 500px;
-    padding: 10px;
-    background-color: darkseagreen;
+    width: 380px;
+    height: auto;
+    max-height: 500px;
+    padding: 20px;
+    background-color: #121212;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    margin: 0;
 }
-
-ul {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-}
-

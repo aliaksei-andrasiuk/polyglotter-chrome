@@ -17,13 +17,10 @@ export const useSetupContent = () => {
     const popupOnCloseTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        chrome.storage.local.get(['pauseState'], (result) => {
-            const pauseState = result.pauseState;
-            const now = Date.now();
+        chrome.storage.local.get(['extensionStatus'], (result) => {
+            const status = result.extensionStatus;
 
-            if (!pauseState || pauseState.isPaused !== true || (pauseState.until && pauseState.until < now)) {
-                handleSetupContent();
-            }
+            status.isEnabled && handleSetupContent();
         });
 
         window.addEventListener('message', onReceiveOffset, false);
@@ -49,7 +46,7 @@ export const useSetupContent = () => {
         const articleText = getArticleText();
 
         if (!articleText) {
-            console.error('No article text found.');
+            console.log('No article text found.');
             return;
         }
 
